@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Resume Matcher</title>
+<style>
+body{font-family:Arial;background:#0a192f;color:white;display:flex;justify-content:center;padding:40px}
+.card{background:#112240;padding:30px;border-radius:15px;width:500px}
+input,textarea{width:100%;padding:10px;margin:10px 0;border-radius:8px;border:none}
+button{width:100%;padding:12px;background:cyan;font-weight:bold;border-radius:8px;cursor:pointer}
+.result{margin-top:20px;background:#0a192f;padding:15px;border-radius:10px;border:1px solid cyan}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>AI Resume Matcher 🚀</h2>
+<input type="file" id="resume" accept=".pdf">
+<textarea id="jd" rows="5" placeholder="Paste Job Description here..."></textarea>
+<button onclick="analyze()">Analyze</button>
+<div id="result" class="result" style="display:none"></div>
+</div>
+<script>
+async function analyze(){
+const file=document.getElementById('resume').files[0];
+const jd=document.getElementById('jd').value;
+if(!file||!jd){alert("Resume aur JD dono daalo");return;}
+const fd=new FormData();
+fd.append('resume',file);
+fd.append('job_description',jd);
+document.getElementById('result').innerHTML="Analyzing...";
+document.getElementById('result').style.display="block";
+const res=await fetch('/api/analyze',{method:'POST',body:fd});
+const data=await res.json();
+let html = "<b>Score: " + data.match.match_score + "%</b><br>";
+html += "<b>Matched:</b> " + data.match.matched_skills.join(', ') + "<br>";
+html += "<b>Your Skills:</b> " + data.skills.join(', ') + "<br><br>";
+html += "<b>Interview Qs:</b><br> - " + data.questions.join('<br> - ');
+document.getElementById('result').innerHTML = html;
+}
+</script>
+</body>
+</html>
